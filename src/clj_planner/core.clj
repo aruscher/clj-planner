@@ -4,4 +4,4 @@
 
 
 
-(slurp "resoruces/hanoi-problem.pddl")
+(def *foo* (slurp "src/resources/hanoi-domain.pddl"))
