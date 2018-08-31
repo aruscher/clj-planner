@@ -3,9 +3,10 @@
   (:require [clojure.string :as str]
             [clojure.pprint :as pprint]))
 
-(def *test-foo* "(define (domain foo))")
-
-(def *foo* (slurp "src/resources/hanoi-domain.pddl"))
+(def *test-definition "(define (domain foo))")
+(def *test-domain* (slurp "src/resources/hanoi-domain.pddl"))
+(def *test-problem* (slurp "src/resources/hanoi-problem.pddl"))
+(def *test-types* '(disc - target peg - target))
 
 (defn tokenize [str]
   (remove #(str/blank? %)
@@ -15,11 +16,17 @@
 (defn cant-parse [what]
   (throw (IllegalArgumentException. (str "Cant parse " what))))
 
+
+(defn build-supertype-set-map
+  [subtype supertype]
+  (cond
+    (nil? supertype) {subtype #{subtype 'object}}
+    :else {subtype #{subtype supertype 'object}}))
+
 (defn build-type-map
   [subtypes supertype]
   (reduce merge
-          (map #(do {% (set [% supertype 'object])})
-           subtypes)))
+          (map #(build-supertype-set-map % supertype) subtypes)))
 
 (defn parse-requirements
   [content]
@@ -28,9 +35,10 @@
 (defn parse-types
   ([content] (parse-types content {}))
   ([content result]
-   (cond
-     (empty? content) result
-     :else            (cant-parse content))))
+   (let [[subtypes others] (split-with #(not= '- %) content)
+         supertype (first (next others))
+         ]
+     (println "Subtypes: " subtypes "; Supertype: " supertype))))
 
 (defn parse
   [clause]
