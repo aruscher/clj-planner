@@ -14,8 +14,8 @@
 (defn build-supertype-set-map
   [subtype supertype]
   (if (nil? supertype)
-    {subtype #{subtype 'object}}
-    {subtype #{subtype supertype 'object}}))
+    {subtype (into #{} [subtype 'object])}
+    {subtype (into #{} [subtype supertype 'object])}))
 
 (defn build-type-map
   [subtypes supertype]
